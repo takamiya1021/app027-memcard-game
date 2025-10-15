@@ -22,6 +22,8 @@ function App() {
     isResolving,
     remainingTimeMs,
     difficulty,
+    theme,
+    themes,
     hintAvailable,
     hintUsed,
     isHintPreviewing,
@@ -30,6 +32,7 @@ function App() {
     flipCard,
     restart,
     changeDifficulty,
+    changeTheme,
     useHint,
     resumeSession,
     resetProgress,
@@ -159,6 +162,9 @@ function App() {
         remainingTimeMs={remainingTimeMs}
         difficulty={difficulty}
         onSelectDifficulty={changeDifficulty}
+        theme={theme}
+        themes={themes}
+        onSelectTheme={changeTheme}
         hintAvailable={hintAvailable}
         hintUsed={hintUsed}
       />
@@ -208,11 +214,12 @@ function App() {
         savedAt={pendingSession?.savedAt}
         score={pendingSession?.score}
         matchedPairs={pendingSession?.matchedPairs}
-        totalPairs={totalPairs}
+        totalPairs={pendingSession?.totalPairs ?? totalPairs}
         remainingTimeMs={
           pendingSession?.remainingTimeMs ?? remainingTimeMs ?? null
         }
         difficulty={pendingSession?.difficulty ?? difficulty}
+        theme={pendingSession?.theme ?? theme}
       />
 
       <SettingsPanel
@@ -221,6 +228,12 @@ function App() {
         difficulty={difficulty}
         onSelectDifficulty={(mode) => {
           changeDifficulty(mode)
+          setIsSettingsOpen(false)
+        }}
+        theme={theme}
+        themes={themes}
+        onSelectTheme={(mode) => {
+          changeTheme(mode)
           setIsSettingsOpen(false)
         }}
         bestScores={bestScores}

@@ -1,4 +1,5 @@
-import type { Difficulty } from '../hooks/useGameEngine'
+import type { Difficulty, Theme } from '../hooks/useGameEngine'
+import { THEME_LABEL } from '../hooks/useGameEngine'
 
 const DIFFICULTY_LABEL: Record<Difficulty, string> = {
   easy: 'やさしい',
@@ -17,6 +18,7 @@ type ResumeModalProps = {
   totalPairs: number
   remainingTimeMs?: number | null
   difficulty: Difficulty
+  theme: Theme
 }
 
 function formatDate(timestamp?: number | null) {
@@ -50,6 +52,7 @@ export function ResumeModal({
   totalPairs,
   remainingTimeMs,
   difficulty,
+  theme,
 }: ResumeModalProps) {
   if (!open) {
     return null
@@ -73,6 +76,7 @@ export function ResumeModal({
         <section className="mt-4 rounded-2xl bg-sky-50 p-4 text-sm text-slate-700">
           <dl className="grid grid-cols-2 gap-y-2">
             <Detail label="難易度" value={DIFFICULTY_LABEL[difficulty]} />
+            <Detail label="テーマ" value={THEME_LABEL[theme]} />
             <Detail label="保存時刻" value={formatDate(savedAt)} />
             <Detail label="スコア" value={`${score ?? 0} 点`} />
             <Detail label="そろえたペア" value={`${matchedPairs ?? 0} / ${totalPairs}`} />

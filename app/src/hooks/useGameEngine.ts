@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useLocalStorage } from './useLocalStorage'
 import { shuffle } from '../utils/shuffle'
+import { sampleCardBack, sampleFrontCards } from '../data/sampleCards'
 
-const ICON_POOL = [
+const EMOJI_POOL = [
   '🐶',
   '🐱',
   '🦊',
@@ -20,10 +21,92 @@ const ICON_POOL = [
 
 export type CardStatus = 'hidden' | 'flipped' | 'matched'
 
+type EmojiArtwork = {
+  kind: 'emoji'
+  value: string
+  label: string
+}
+
+type ImageArtwork = {
+  kind: 'image'
+  src: string
+  alt: string
+  label: string
+}
+
+type CardArtwork = EmojiArtwork | ImageArtwork
+
+export type Theme = 'emoji' | 'storybook'
+
+export const THEME_ORDER: Theme[] = ['emoji', 'storybook']
+
+export const THEME_LABEL: Record<Theme, string> = {
+  emoji: 'えもじデッキ',
+  storybook: 'サンプルデッキ',
+}
+
+export const THEME_DESCRIPTION: Record<Theme, string> = {
+  emoji: 'カラフルな絵文字がいっぱいの定番デッキ',
+  storybook: 'サンプルのイラストカードが主役の特別デッキ',
+}
+
+type FrontBlueprint = {
+  key: string
+  front: CardArtwork
+}
+
+type ThemeConfig = {
+  back: CardArtwork
+  blueprints: FrontBlueprint[]
+  fallbackThemes?: Theme[]
+}
+
+const EMOJI_BLUEPRINTS: FrontBlueprint[] = EMOJI_POOL.map((icon) => ({
+  key: `emoji-${icon.codePointAt(0)?.toString(16) ?? icon}`,
+  front: {
+    kind: 'emoji',
+    value: icon,
+    label: `${icon} のカード`,
+  },
+}))
+
+const SAMPLE_BLUEPRINTS: FrontBlueprint[] = sampleFrontCards.map((card) => ({
+  key: `sample-${card.id}`,
+  front: {
+    kind: 'image',
+    src: card.asset,
+    alt: `${card.title}カード`,
+    label: `${card.title}カード`,
+  },
+}))
+
+const THEME_CONFIG: Record<Theme, ThemeConfig> = {
+  emoji: {
+    back: {
+      kind: 'emoji',
+      value: '🎴',
+      label: 'カードの裏面',
+    },
+    blueprints: EMOJI_BLUEPRINTS,
+  },
+  storybook: {
+    back: {
+      kind: 'image',
+      src: sampleCardBack,
+      alt: 'サンプルカードの裏面',
+      label: 'サンプルカードの裏面',
+    },
+    blueprints: SAMPLE_BLUEPRINTS,
+    fallbackThemes: ['emoji'],
+  },
+}
+
 export type CardModel = {
   id: string
   pairId: string
-  icon: string
+  front: CardArtwork
+  back: CardArtwork
+  theme: Theme
   status: CardStatus
 }
 
@@ -36,6 +119,7 @@ const HINT_REVEAL_MS = 1000
 const MISMATCH_HIDE_MS = 900
 
 const LAST_DIFFICULTY_KEY = 'memory-card-game:last-difficulty'
+const LAST_THEME_KEY = 'memory-card-game:last-theme'
 const HIGH_SCORE_KEY = 'memory-card-game:high-scores'
 const SESSION_KEY = 'memory-card-game:session'
 
@@ -53,6 +137,7 @@ const DIFFICULTY_SETTINGS: Record<Difficulty, DifficultyConfig> = {
 
 type PersistedSession = {
   difficulty: Difficulty
+  theme: Theme
   cards: CardModel[]
   flippedIds: string[]
   matchedPairs: number
@@ -72,32 +157,79 @@ type GameEngineSnapshot = {
   isResolving: boolean
   remainingTimeMs: number | null
   difficulty: Difficulty
+  theme: Theme
   hintAvailable: boolean
   hintUsed: boolean
   isHintPreviewing: boolean
   resumeAvailable: boolean
 }
 
-function buildDeck(totalPairs: number): CardModel[] {
-  const icons = shuffle(ICON_POOL).slice(0, totalPairs)
-  const pairs = icons.flatMap((icon, index) => {
-    const pairId = `pair-${index}`
+function cloneArtwork(artwork: CardArtwork): CardArtwork {
+  if (artwork.kind === 'emoji') {
+    return { ...artwork }
+  }
+  return { ...artwork }
+}
+
+function pickBlueprints(theme: Theme, totalPairs: number): FrontBlueprint[] {
+  const usedKeys = new Set<string>()
+  const selections: FrontBlueprint[] = []
+  const queue: Theme[] = [theme]
+
+  while (queue.length > 0 && selections.length < totalPairs) {
+    const current = queue.shift() as Theme
+    const config = THEME_CONFIG[current]
+    const candidates = shuffle(config.blueprints).filter(
+      (blueprint) => !usedKeys.has(blueprint.key),
+    )
+    for (const blueprint of candidates) {
+      selections.push(blueprint)
+      usedKeys.add(blueprint.key)
+      if (selections.length === totalPairs) {
+        break
+      }
+    }
+    if (
+      selections.length < totalPairs &&
+      current === theme &&
+      config.fallbackThemes
+    ) {
+      queue.push(...config.fallbackThemes)
+    }
+  }
+
+  return selections
+}
+
+function buildDeck(totalPairs: number, theme: Theme): CardModel[] {
+  const picks = pickBlueprints(theme, totalPairs)
+  const config = THEME_CONFIG[theme]
+  const back = config.back
+
+  const cards = picks.flatMap((blueprint, index) => {
+    const pairId = `pair-${index}-${blueprint.key}`
+    const front = blueprint.front
     return [
       {
         id: `${pairId}-a`,
         pairId,
-        icon,
+        front: cloneArtwork(front),
+        back: cloneArtwork(back),
+        theme,
         status: 'hidden' as CardStatus,
       },
       {
         id: `${pairId}-b`,
         pairId,
-        icon,
+        front: cloneArtwork(front),
+        back: cloneArtwork(back),
+        theme,
         status: 'hidden' as CardStatus,
       },
     ]
   })
-  return shuffle(pairs)
+
+  return shuffle(cards)
 }
 
 function loadPersistedSession(): PersistedSession | null {
@@ -114,6 +246,9 @@ function loadPersistedSession(): PersistedSession | null {
     if (!config) {
       return null
     }
+    if (!parsed.theme || !THEME_CONFIG[parsed.theme]) {
+      return null
+    }
     return parsed
   } catch (error) {
     console.warn('セッション読み込みでエラー発生', error)
@@ -126,10 +261,11 @@ export function useGameEngine() {
     LAST_DIFFICULTY_KEY,
     'easy',
   )
+  const [theme, setTheme] = useLocalStorage<Theme>(LAST_THEME_KEY, 'emoji')
   const config = useMemo(() => DIFFICULTY_SETTINGS[difficulty], [difficulty])
 
   const [cards, setCards] = useState<CardModel[]>(() =>
-    buildDeck(config.totalPairs),
+    buildDeck(config.totalPairs, theme),
   )
   const [flippedIds, setFlippedIds] = useState<string[]>([])
   const [matchedPairs, setMatchedPairs] = useState(0)
@@ -240,14 +376,15 @@ export function useGameEngine() {
   )
 
   const startNewRound = useCallback(
-    (nextDifficulty: Difficulty = difficulty) => {
+    (nextDifficulty: Difficulty = difficulty, nextTheme: Theme = theme) => {
       const nextConfig = DIFFICULTY_SETTINGS[nextDifficulty]
       clearTimer()
       clearMismatchTimeout()
       clearHintTimeout()
 
       setDifficulty(nextDifficulty)
-      setCards(buildDeck(nextConfig.totalPairs))
+      setTheme(nextTheme)
+      setCards(buildDeck(nextConfig.totalPairs, nextTheme))
       setFlippedIds([])
       setMatchedPairs(0)
       setScore(0)
@@ -259,7 +396,16 @@ export function useGameEngine() {
       setHasNewBest(false)
       persistSession(null)
     },
-    [clearHintTimeout, clearMismatchTimeout, clearTimer, difficulty, persistSession, setDifficulty],
+    [
+      clearHintTimeout,
+      clearMismatchTimeout,
+      clearTimer,
+      difficulty,
+      persistSession,
+      setDifficulty,
+      setTheme,
+      theme,
+    ],
   )
 
   useEffect(() => {
@@ -298,7 +444,7 @@ export function useGameEngine() {
     }
   }, [clearTimer, config.timeLimitMs, finalizeGame, status])
 
-  const totalPairs = config.totalPairs
+  const totalPairs = useMemo(() => Math.floor(cards.length / 2), [cards])
 
   useEffect(() => {
     if (flippedIds.length !== 2) {
@@ -363,6 +509,7 @@ export function useGameEngine() {
 
     persistSession({
       difficulty,
+      theme,
       cards,
       flippedIds,
       matchedPairs,
@@ -372,7 +519,19 @@ export function useGameEngine() {
       status,
       savedAt: Date.now(),
     })
-  }, [cards, config.timeLimitMs, difficulty, flippedIds, hintUsed, matchedPairs, persistSession, remainingTimeMs, score, status])
+  }, [
+    cards,
+    config.timeLimitMs,
+    difficulty,
+    flippedIds,
+    hintUsed,
+    matchedPairs,
+    persistSession,
+    remainingTimeMs,
+    score,
+    status,
+    theme,
+  ])
 
   const flipCard = useCallback(
     (cardId: string) => {
@@ -426,8 +585,8 @@ export function useGameEngine() {
   }, [clearHintTimeout, config.hintAvailable, hintUsed, status])
 
   const restart = useCallback(() => {
-    startNewRound(difficulty)
-  }, [difficulty, startNewRound])
+    startNewRound(difficulty, theme)
+  }, [difficulty, startNewRound, theme])
 
   const changeDifficulty = useCallback(
     (nextDifficulty: Difficulty) => {
@@ -435,9 +594,20 @@ export function useGameEngine() {
         restart()
         return
       }
-      startNewRound(nextDifficulty)
+      startNewRound(nextDifficulty, theme)
     },
-    [difficulty, restart, startNewRound],
+    [difficulty, restart, startNewRound, theme],
+  )
+
+  const changeTheme = useCallback(
+    (nextTheme: Theme) => {
+      if (nextTheme === theme) {
+        restart()
+        return
+      }
+      startNewRound(difficulty, nextTheme)
+    },
+    [difficulty, restart, startNewRound, theme],
   )
 
   const resumeSession = useCallback(() => {
@@ -447,6 +617,7 @@ export function useGameEngine() {
 
     const session = pendingSession
     setDifficulty(session.difficulty)
+    setTheme(session.theme)
     const sessionConfig = DIFFICULTY_SETTINGS[session.difficulty]
 
     clearTimer()
@@ -467,7 +638,15 @@ export function useGameEngine() {
     setHasNewBest(false)
 
     persistSession(null)
-  }, [clearHintTimeout, clearMismatchTimeout, clearTimer, pendingSession, persistSession, setDifficulty])
+  }, [
+    clearHintTimeout,
+    clearMismatchTimeout,
+    clearTimer,
+    pendingSession,
+    persistSession,
+    setDifficulty,
+    setTheme,
+  ])
 
   const resetProgress = useCallback(() => {
     setBestScores({ easy: 0, normal: 0, hard: 0 })
@@ -485,10 +664,12 @@ export function useGameEngine() {
     }
     return {
       difficulty: pendingSession.difficulty,
+      theme: pendingSession.theme,
       savedAt: pendingSession.savedAt,
       score: pendingSession.score,
       matchedPairs: pendingSession.matchedPairs,
       remainingTimeMs: pendingSession.remainingTimeMs,
+      totalPairs: Math.floor(pendingSession.cards.length / 2),
     }
   }, [pendingSession])
 
@@ -501,6 +682,7 @@ export function useGameEngine() {
     isResolving,
     remainingTimeMs,
     difficulty,
+    theme,
     hintAvailable: config.hintAvailable,
     hintUsed,
     isHintPreviewing,
@@ -513,9 +695,11 @@ export function useGameEngine() {
     bestScores,
     hasNewBest,
     pendingSession: pendingSessionMeta,
+    themes: THEME_ORDER,
     flipCard,
     restart,
     changeDifficulty,
+    changeTheme,
     useHint,
     startNewRound,
     resumeSession,

@@ -1,4 +1,5 @@
-import type { Difficulty } from '../hooks/useGameEngine'
+import type { Difficulty, Theme } from '../hooks/useGameEngine'
+import { THEME_DESCRIPTION, THEME_LABEL } from '../hooks/useGameEngine'
 import type { SoundSettings } from '../hooks/useSound'
 
 const DIFFICULTY_LABEL: Record<Difficulty, string> = {
@@ -12,6 +13,9 @@ type SettingsPanelProps = {
   onClose: () => void
   difficulty: Difficulty
   onSelectDifficulty: (difficulty: Difficulty) => void
+  theme: Theme
+  themes: Theme[]
+  onSelectTheme: (theme: Theme) => void
   bestScores: Record<Difficulty, number>
   onResetProgress: () => void
   soundSettings: SoundSettings
@@ -24,6 +28,9 @@ export function SettingsPanel({
   onClose,
   difficulty,
   onSelectDifficulty,
+  theme,
+  themes,
+  onSelectTheme,
   bestScores,
   onResetProgress,
   soundSettings,
@@ -70,6 +77,37 @@ export function SettingsPanel({
                       ベスト {bestScores[mode] ?? 0}
                     </span>
                   </div>
+                </button>
+              )
+            })}
+          </div>
+        </section>
+
+        <section className="mt-6 space-y-3">
+          <h3 className="text-sm font-semibold text-slate-600">カードのテーマ</h3>
+          <p className="text-xs text-slate-500">
+            サンプルカード入りのデッキに切り替えると、難易度はそのままに見た目だけが変わります。
+          </p>
+          <div className="flex flex-col gap-2">
+            {themes.map((mode) => {
+              const isActive = mode === theme
+              return (
+                <button
+                  key={mode}
+                  type="button"
+                  onClick={() => onSelectTheme(mode)}
+                  className={`flex flex-col gap-1 rounded-2xl border px-4 py-3 text-left transition focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-200 ${
+                    isActive
+                      ? 'border-amber-300 bg-amber-50 text-amber-700'
+                      : 'border-slate-200 bg-white text-slate-600 hover:border-amber-200 hover:bg-amber-50/60'
+                  }`}
+                >
+                  <span className="text-sm font-semibold">
+                    {THEME_LABEL[mode]}
+                  </span>
+                  <span className="text-[11px] text-slate-400">
+                    {THEME_DESCRIPTION[mode]}
+                  </span>
                 </button>
               )
             })}

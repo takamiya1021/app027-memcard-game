@@ -168,6 +168,21 @@ describe('useGameEngine', () => {
     expect(result.current.resumeAvailable).toBe(false)
   })
 
+  it('switches to the storybook theme and mixes sample cards into the deck', async () => {
+    const { result } = renderHook(() => useGameEngine())
+
+    act(() => {
+      result.current.changeTheme('storybook')
+    })
+
+    expect(result.current.theme).toBe('storybook')
+    expect(result.current.cards.length).toBe(result.current.totalPairs * 2)
+    const hasImageFront = result.current.cards.some(
+      (card) => card.front.kind === 'image',
+    )
+    expect(hasImageFront).toBe(true)
+  })
+
   it('restores the saved state when resuming a session', async () => {
     const initial = renderHook(() => useGameEngine())
     const pair = findPair(initial.result.current.cards)
@@ -183,18 +198,19 @@ describe('useGameEngine', () => {
 
     initial.unmount()
 
-    const resumed = renderHook(() => useGameEngine())
-    expect(resumed.result.current.resumeAvailable).toBe(true)
-    const savedPair = pair
+  const resumed = renderHook(() => useGameEngine())
+  expect(resumed.result.current.resumeAvailable).toBe(true)
+  const savedPair = pair
 
-    act(() => {
-      resumed.result.current.resumeSession()
-    })
-
-    const [firstId, secondId] = savedPair
-    const firstCard = resumed.result.current.cards.find((card) => card.id === firstId)
-    const secondCard = resumed.result.current.cards.find((card) => card.id === secondId)
-    expect(firstCard?.status).toBe('matched')
-    expect(secondCard?.status).toBe('matched')
+  act(() => {
+    resumed.result.current.resumeSession()
   })
+
+  const [firstId, secondId] = savedPair
+  const firstCard = resumed.result.current.cards.find((card) => card.id === firstId)
+  const secondCard = resumed.result.current.cards.find((card) => card.id === secondId)
+  expect(firstCard?.status).toBe('matched')
+  expect(secondCard?.status).toBe('matched')
+  expect(resumed.result.current.theme).toBe(initial.result.current.theme)
+})
 })

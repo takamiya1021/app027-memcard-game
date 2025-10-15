@@ -1,4 +1,5 @@
-import type { Difficulty } from '../hooks/useGameEngine'
+import type { Difficulty, Theme } from '../hooks/useGameEngine'
+import { THEME_DESCRIPTION, THEME_LABEL } from '../hooks/useGameEngine'
 
 type HUDProps = {
   score: number
@@ -9,6 +10,9 @@ type HUDProps = {
   remainingTimeMs: number | null
   difficulty: Difficulty
   onSelectDifficulty: (difficulty: Difficulty) => void
+  theme: Theme
+  themes: Theme[]
+  onSelectTheme: (theme: Theme) => void
   hintAvailable: boolean
   hintUsed: boolean
 }
@@ -38,6 +42,9 @@ export function HUD({
   remainingTimeMs,
   difficulty,
   onSelectDifficulty,
+  theme,
+  themes,
+  onSelectTheme,
   hintAvailable,
   hintUsed,
 }: HUDProps) {
@@ -80,6 +87,36 @@ export function HUD({
                 <span>{label}</span>
                 <span className="text-xs font-medium text-slate-400">
                   ベスト {personalBest}
+                </span>
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      <div className="flex flex-col gap-2">
+        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">
+          カードのテーマ
+        </p>
+        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+          {themes.map((mode) => {
+            const isActive = mode === theme
+            return (
+              <button
+                key={mode}
+                type="button"
+                onClick={() => onSelectTheme(mode)}
+                className={`flex min-w-[180px] flex-1 flex-col rounded-2xl border px-4 py-3 text-left transition focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-200 ${
+                  isActive
+                    ? 'border-amber-300 bg-amber-50 text-amber-700'
+                    : 'border-slate-200 bg-white text-slate-600 hover:border-amber-200 hover:bg-amber-50/60'
+                }`}
+              >
+                <span className="text-sm font-semibold">
+                  {THEME_LABEL[mode]}
+                </span>
+                <span className="text-[11px] text-slate-400">
+                  {THEME_DESCRIPTION[mode]}
                 </span>
               </button>
             )
