@@ -444,7 +444,7 @@ export function useGameEngine() {
     }
   }, [clearTimer, config.timeLimitMs, finalizeGame, status])
 
-  const totalPairs = useMemo(() => Math.floor(cards.length / 2), [cards])
+  const totalPairs = config.totalPairs
 
   useEffect(() => {
     if (flippedIds.length !== 2) {
