@@ -58,52 +58,54 @@ export function HowToPlayModal({ open, onClose, difficulty }: HowToPlayModalProp
   const currentCard = sampleFrontCards[activeIndex]
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4 backdrop-blur">
-      <div className="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl">
-        <header className="bg-sky-500/10 px-6 py-5">
-          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-sky-500">
-            How to Play
-          </p>
-          <h2 className="mt-2 text-2xl font-bold text-slate-800">
-            きらめきメモリーカードの遊び方
-          </h2>
-          <p className="mt-2 text-sm text-slate-600">
-            ゲームの基本とコツをサクッとチェックしよか。今は「{DIFFICULTY_LABEL[difficulty]}」モードで遊べるで。
-          </p>
-        </header>
+      <div className="w-full max-w-2xl">
+        <div className="flex max-h-[min(90vh,720px)] flex-col overflow-hidden rounded-3xl bg-white shadow-2xl">
+          <header className="bg-sky-500/10 px-6 py-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-sky-500">
+              How to Play
+            </p>
+            <h2 className="mt-2 text-2xl font-bold text-slate-800">
+              きらめきメモリーカードの遊び方
+            </h2>
+            <p className="mt-2 text-sm text-slate-600">
+              ゲームの基本とコツをサクッとチェックしよか。今は「{DIFFICULTY_LABEL[difficulty]}」モードで遊べるで。
+            </p>
+          </header>
 
-        <div className="space-y-4 px-6 py-5">
-          <PreviewDemo
-            backAsset={sampleCardBack}
-            currentCard={currentCard}
-            activeIndex={activeIndex}
-            onSelect={setActiveIndex}
-          />
+          <div className="flex-1 space-y-4 overflow-y-auto px-6 py-5">
+            <PreviewDemo
+              backAsset={sampleCardBack}
+              currentCard={currentCard}
+              activeIndex={activeIndex}
+              onSelect={setActiveIndex}
+            />
 
-          {steps.map((step) => (
-            <article
-              key={step.title}
-              className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 px-4 py-3"
+            {steps.map((step) => (
+              <article
+                key={step.title}
+                className="flex items-start gap-4 rounded-2xl border border-slate-100 bg-slate-50/60 px-4 py-3"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-100 text-2xl">
+                  <span aria-hidden>{step.icon}</span>
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-slate-700">{step.title}</h3>
+                  <p className="text-sm text-slate-500">{step.description}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <footer className="flex flex-col gap-3 bg-slate-50 px-6 py-5 sm:flex-row sm:justify-end">
+            <button
+              type="button"
+              onClick={onClose}
+              className="rounded-full bg-sky-500 px-6 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-sky-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-300"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-sky-100 text-2xl">
-                <span aria-hidden>{step.icon}</span>
-              </div>
-              <div>
-                <h3 className="text-base font-semibold text-slate-700">{step.title}</h3>
-                <p className="text-sm text-slate-500">{step.description}</p>
-              </div>
-            </article>
-          ))}
+              はじめる
+            </button>
+          </footer>
         </div>
-
-        <footer className="flex flex-col gap-3 bg-slate-50 px-6 py-5 sm:flex-row sm:justify-end">
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-full bg-sky-500 px-6 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-sky-600 focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-300"
-          >
-            はじめる
-          </button>
-        </footer>
       </div>
     </div>
   )
