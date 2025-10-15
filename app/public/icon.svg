@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 背景 -->
+  <rect width="512" height="512" fill="#3b82f6" rx="64"/>
+
+  <!-- カード1（左） -->
+  <rect x="80" y="140" width="160" height="232" fill="#ffffff" rx="12"/>
+  <text x="160" y="280" font-size="96" text-anchor="middle" fill="#3b82f6">🎴</text>
+
+  <!-- カード2（右） -->
+  <rect x="272" y="140" width="160" height="232" fill="#ffffff" rx="12"/>
+  <text x="352" y="280" font-size="96" text-anchor="middle" fill="#3b82f6">🎴</text>
+
+  <!-- キラキラ効果 -->
+  <circle cx="120" cy="100" r="8" fill="#fbbf24" opacity="0.8"/>
+  <circle cx="160" cy="80" r="6" fill="#fbbf24" opacity="0.8"/>
+  <circle cx="380" cy="90" r="8" fill="#fbbf24" opacity="0.8"/>
+  <circle cx="420" cy="110" r="6" fill="#fbbf24" opacity="0.8"/>
+  <circle cx="100" cy="420" r="6" fill="#fbbf24" opacity="0.8"/>
+  <circle cx="400" cy="430" r="8" fill="#fbbf24" opacity="0.8"/>
+</svg>
