@@ -126,7 +126,7 @@ function PreviewDemo({
     <section className="rounded-2xl border border-sky-100 bg-white/60 p-4">
       <h3 className="text-sm font-semibold text-sky-700">カードの動きを見てみよう</h3>
       <p className="mt-2 text-xs text-slate-500">
-        左のカードは自動でくるっとひっくり返る実演。右側は同じカードを揃えたときのイメージやで。
+        左のカードで「裏→表」にめくる動きを確認して、右のカードで同じ絵柄をそろえた瞬間のゴールをイメージしてな。裏面を覚えて、同じ柄をめくれたらペア成立や。
       </p>
 
       <div className="mt-4 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
@@ -162,7 +162,9 @@ function PreviewDemo({
         <div className="flex items-center gap-3">
           <MatchedCard asset={currentCard.asset} celebrate />
           <MatchedCard asset={currentCard.asset} />
-          <span className="text-sm font-semibold text-emerald-600">そろった！</span>
+          <span className="text-sm font-semibold text-emerald-600">
+            2枚が同じ絵柄ならゲットや！
+          </span>
         </div>
       </div>
 

@@ -1,31 +1,31 @@
 # 実装計画書（MVP 1時間スコープ）
 
 ## フェーズ1: 環境構築（予定工数: 10分）
-【 】Vite + React + TypeScript プロジェクト初期化（`npm create vite@latest memory-card-game -- --template react-ts`）  
-【 】Tailwind CSS 導入と初期設定（`postcss.config.cjs`, `tailwind.config.cjs`, `index.css` 調整）  
-【 】ESLint/Prettier 設定（Viteテンプレート準拠でOK）  
-【 】初期表示確認（`npm install` → `npm run dev`）
+【x】Vite + React + TypeScript プロジェクト初期化（`npm create vite@latest memory-card-game -- --template react-ts`）  
+【x】Tailwind CSS 導入と初期設定（`postcss.config.cjs`, `tailwind.config.cjs`, `index.css` 調整）  
+【x】ESLint/Prettier 設定（Viteテンプレート準拠でOK）  
+【x】初期表示確認（`npm install` → `npm run dev`）
 
 ## フェーズ2: コアゲームロジック（予定工数: 20分）
-【 】カードデータモデル・シャッフルユーティリティ実装（`src/utils/shuffle.ts`）  
-【 】`useGameEngine` フック作成（10枚固定、タイマーなし、スコア初期値）  
-【 】ゲーム状態（カードめくり、マッチ判定、リスタート）を実装  
-【 】最小スコア計算（ペア成立 +30、ミス -5 程度の仮ロジック）
+【x】カードデータモデル・シャッフルユーティリティ実装（`src/utils/shuffle.ts`）  
+【x】`useGameEngine` フック作成（10枚固定、タイマーなし、スコア初期値）  
+【x】ゲーム状態（カードめくり、マッチ判定、リスタート）を実装  
+【x】最小スコア計算（ペア成立 +30、ミス -5 程度の仮ロジック）
 
 ## フェーズ3: UI コンポーネント（予定工数: 20分）
-【 】`MemoryCard` コンポーネント（フリップ演出、アクセシビリティ対応）  
-【 】`CardGrid` レイアウト（10枚、レスポンシブ 2列/5列切替）  
-【 】`HUD`（現在スコア、成功ペア数、残りカード数）  
-【 】`ActionBar`（リスタートボタン）
+【x】`MemoryCard` コンポーネント（フリップ演出、アクセシビリティ対応）  
+【x】`CardGrid` レイアウト（10枚、レスポンシブ 2列/5列切替）  
+【x】`HUD`（現在スコア、成功ペア数、残りカード数）  
+【x】`ActionBar`（リスタートボタン）
 
 ## フェーズ4: ゲームフロー統合（予定工数: 5分）
-【 】`App.tsx` に `GameScreen` を配置し一連の操作を繋ぐ  
-【 】ペア全消去時に `ScoreModal` 表示（シンプルな祝福テキストのみ）
+【x】`App.tsx` に `GameScreen` を配置し一連の操作を繋ぐ  
+【x】ペア全消去時に `ScoreModal` 表示（シンプルな祝福テキストのみ）
 
 ## フェーズ5: 永続化・仕上げ（予定工数: 5分）
-【 】`useLocalStorage` フックで最高スコア保存・読み込み  
-【 】カードデザイン（仮アイコン: emoji で代替）と基本スタイル調整  
-【 】最低限のユニットテスト（`useGameEngine` のマッチ/ミス処理）
+【x】`useLocalStorage` フックで最高スコア保存・読み込み  
+【x】カードデザイン（仮アイコン: emoji で代替）と基本スタイル調整  
+【x】最低限のユニットテスト（`useGameEngine` のマッチ/ミス処理）
 
 ## オプション（時間が余った場合）
 - 難易度選択（12枚, 15枚対応）
