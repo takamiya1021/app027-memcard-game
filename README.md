@@ -7,6 +7,8 @@
 [![Vite](https://img.shields.io/badge/Vite-7.1-646CFF.svg)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.x-38B2AC.svg)](https://tailwindcss.com/)
 
+![ゲーム画面](docs/images/screenshot.png)
+
 ## ✨ 特徴
 
 - 🎮 **3段階の難易度**: やさしい・ふつう・むずかしい から選択可能

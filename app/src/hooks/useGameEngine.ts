@@ -339,6 +339,8 @@ export function useGameEngine() {
 
   const finalizeGame = useCallback(
     (didComplete: boolean, finalScore: number) => {
+      console.log(`🏁 finalizeGame呼び出し: didComplete=${didComplete}, finalScore=${finalScore}`)
+      console.trace('呼び出し元のスタックトレース')
       clearTimer()
       clearMismatchTimeout()
       clearHintTimeout()
@@ -470,7 +472,9 @@ export function useGameEngine() {
       setScore(nextScore)
       setMatchedPairs((prev) => {
         const next = prev + 1
+        console.log(`🎮 マッチ判定: prev=${prev}, next=${next}, totalPairs=${totalPairs}, config.totalPairs=${config.totalPairs}`)
         if (next === totalPairs) {
+          console.log(`✅ 全ペア揃った！next(${next}) === totalPairs(${totalPairs})`)
           finalizeGame(true, nextScore)
         }
         return next
