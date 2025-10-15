@@ -10,7 +10,7 @@ export type SoundSettings = {
 
 const DEFAULT_SETTINGS: SoundSettings = {
   sfx: true,
-  bgm: false,
+  bgm: true,
 }
 
 export function useSound() {
@@ -20,8 +20,9 @@ export function useSound() {
   )
 
   const audioContextRef = useRef<AudioContext | null>(null)
-  const bgmSourceRef = useRef<OscillatorNode | null>(null)
+  const bgmSourceRef = useRef<AudioBufferSourceNode | null>(null)
   const bgmGainRef = useRef<GainNode | null>(null)
+  const bgmBufferRef = useRef<AudioBuffer | null>(null)
 
   const ensureContext = useCallback(() => {
     if (typeof window === 'undefined') {
@@ -86,7 +87,7 @@ export function useSound() {
     setTimeout(() => playTone(783.99, 300, 'sine'), 240)
   }, [playTone])
 
-  const startBgm = useCallback(() => {
+  const startBgm = useCallback(async () => {
     if (!settings.bgm) {
       return
     }
@@ -97,19 +98,32 @@ export function useSound() {
     if (bgmSourceRef.current) {
       return
     }
-    const oscillator = ctx.createOscillator()
-    oscillator.type = 'sine'
-    oscillator.frequency.setValueAtTime(220, ctx.currentTime)
+
+    // BGMファイルの読み込み（初回のみ）
+    if (!bgmBufferRef.current) {
+      try {
+        const response = await fetch('/sounds/bgm.mp3')
+        const arrayBuffer = await response.arrayBuffer()
+        bgmBufferRef.current = await ctx.decodeAudioData(arrayBuffer)
+      } catch (error) {
+        console.error('BGM読み込みエラー:', error)
+        return
+      }
+    }
+
+    const source = ctx.createBufferSource()
+    source.buffer = bgmBufferRef.current
+    source.loop = true
 
     const gain = ctx.createGain()
     gain.gain.setValueAtTime(0.0001, ctx.currentTime)
-    gain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 1)
+    gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 1)
 
-    oscillator.connect(gain)
+    source.connect(gain)
     gain.connect(ctx.destination)
-    oscillator.start()
+    source.start()
 
-    bgmSourceRef.current = oscillator
+    bgmSourceRef.current = source
     bgmGainRef.current = gain
   }, [ensureContext, settings.bgm])
 

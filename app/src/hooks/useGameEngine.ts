@@ -624,9 +624,12 @@ export function useGameEngine() {
     clearMismatchTimeout()
     clearHintTimeout()
 
+    // セッションデータからmatchedPairsを再計算（バグったデータ対策）
+    const actualMatchedPairs = session.cards.filter(card => card.status === 'matched').length / 2
+
     setCards(session.cards)
     setFlippedIds(session.flippedIds)
-    setMatchedPairs(session.matchedPairs)
+    setMatchedPairs(actualMatchedPairs)
     setScore(session.score)
     setStatus(session.status === 'finished' ? 'ready' : session.status)
     setIsResolving(false)

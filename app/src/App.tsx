@@ -44,6 +44,7 @@ function App() {
   const [showResumeBadge, setShowResumeBadge] = useState(resumeAvailable)
   const [isResumeModalOpen, setIsResumeModalOpen] = useState(false)
   const [resumePromptShown, setResumePromptShown] = useState(false)
+  const isInitialMount = useRef(true)
 
   const {
     settings: soundSettings,
@@ -80,9 +81,13 @@ function App() {
   }, [hasSeenTutorial])
 
   useEffect(() => {
-    if (resumeAvailable && pendingSession && !resumePromptShown) {
-      setIsResumeModalOpen(true)
-      setResumePromptShown(true)
+    // 初回マウント時のみ「続きから遊ぶ？」を表示
+    if (isInitialMount.current) {
+      if (resumeAvailable && pendingSession && !resumePromptShown) {
+        setIsResumeModalOpen(true)
+        setResumePromptShown(true)
+      }
+      isInitialMount.current = false
     }
     if (!resumeAvailable) {
       setIsResumeModalOpen(false)

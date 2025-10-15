@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>完全クリア</title>
+    <style>
+        body { 
+            font-family: sans-serif; 
+            padding: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+        .container {
+            background: white;
+            color: #333;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            background: #5568d3;
+        }
+        .success { color: #10b981; font-weight: bold; }
+        .info { 
+            background: #f3f4f6; 
+            padding: 15px; 
+            border-radius: 5px; 
+            margin: 20px 0;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 メモリーカードゲーム - データ完全クリア</h1>
+        
+        <div class="info">
+            <p><strong>クリアされるデータ：</strong></p>
+            <ul>
+                <li>保存された進行状況</li>
+                <li>最高スコア</li>
+                <li>難易度設定</li>
+                <li>テーマ設定</li>
+                <li>サウンド設定</li>
+            </ul>
+        </div>
+
+        <button onclick="clearAll()">🗑️ 全てクリア</button>
+        <button onclick="location.href='/'">🏠 ゲームに戻る</button>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        function clearAll() {
+            const keys = Object.keys(localStorage);
+            const gameKeys = keys.filter(k => k.startsWith('memory-card-game'));
+            
+            gameKeys.forEach(key => localStorage.removeItem(key));
+            
+            const result = document.getElementById('result');
+            result.innerHTML = `
+                <div class="success" style="margin-top: 20px;">
+                    <h2>✅ クリア完了！</h2>
+                    <p>削除されたキー: ${gameKeys.length}個</p>
+                    <ul style="text-align: left; max-height: 200px; overflow-y: auto;">
+                        ${gameKeys.map(k => `<li>${k}</li>`).join('')}
+                    </ul>
+                    <p>ゲームに戻って新規プレイしてください。</p>
+                </div>
+            `;
+        }
+        
+        // 起動時に現在のデータを表示
+        window.onload = function() {
+            const keys = Object.keys(localStorage).filter(k => k.startsWith('memory-card-game'));
+            console.log('現在保存されているゲームデータ:', keys);
+        }
+    </script>
+</body>
+</html>
