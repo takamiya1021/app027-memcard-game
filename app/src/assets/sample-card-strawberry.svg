@@ -1,0 +1,26 @@
+<svg width="200" height="280" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="berrySky" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fee2e2"/>
+      <stop offset="100%" stop-color="#fecaca"/>
+    </linearGradient>
+    <linearGradient id="berrySkin" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f97316"/>
+      <stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="184" height="264" rx="24" fill="url(#berrySky)"/>
+  <rect x="18" y="18" width="164" height="244" rx="20" fill="#fff5f5"/>
+  <g transform="translate(100 150)">
+    <path d="M0 -70 C 48 -70 72 -36 72 6 C 72 52 40 90 0 110 C -40 90 -72 52 -72 6 C -72 -36 -48 -70 0 -70 Z" fill="url(#berrySkin)"/>
+    <path d="M0 -80 C -30 -60 -42 -40 -46 -30 C -40 -78 0 -100 0 -100 C 0 -100 40 -78 46 -30 C 42 -40 30 -60 0 -80 Z" fill="#22c55e"/>
+    <g fill="#fde68a" opacity="0.8">
+      <ellipse cx="-30" cy="-10" rx="6" ry="10"/>
+      <ellipse cx="0" cy="-30" rx="6" ry="10"/>
+      <ellipse cx="32" cy="-8" rx="6" ry="10"/>
+      <ellipse cx="-20" cy="25" rx="6" ry="10"/>
+      <ellipse cx="20" cy="28" rx="6" ry="10"/>
+      <ellipse cx="0" cy="12" rx="6" ry="10"/>
+    </g>
+  </g>
+</svg>
