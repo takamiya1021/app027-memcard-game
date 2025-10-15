@@ -295,6 +295,7 @@ export function useGameEngine() {
   const mismatchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const hintTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const scoreRef = useRef(score)
+  const finalizeGameRef = useRef<((didComplete: boolean, finalScore: number) => void) | null>(null)
 
   useEffect(() => {
     scoreRef.current = score
@@ -377,6 +378,10 @@ export function useGameEngine() {
     ],
   )
 
+  useEffect(() => {
+    finalizeGameRef.current = finalizeGame
+  }, [finalizeGame])
+
   const startNewRound = useCallback(
     (nextDifficulty: Difficulty = difficulty, nextTheme: Theme = theme) => {
       const nextConfig = DIFFICULTY_SETTINGS[nextDifficulty]
@@ -434,7 +439,7 @@ export function useGameEngine() {
         const next = Math.max(0, prev - 1000)
         if (next === 0) {
           clearTimer()
-          finalizeGame(false, scoreRef.current)
+          finalizeGameRef.current?.(false, scoreRef.current)
           return 0
         }
         return next
@@ -444,7 +449,7 @@ export function useGameEngine() {
     return () => {
       clearTimer()
     }
-  }, [clearTimer, config.timeLimitMs, finalizeGame, status])
+  }, [clearTimer, config.timeLimitMs, status])
 
   const totalPairs = config.totalPairs
 
