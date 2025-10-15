@@ -56,8 +56,6 @@ export function HowToPlayModal({ open, onClose, difficulty }: HowToPlayModalProp
   }, [])
 
   const currentCard = sampleFrontCards[activeIndex]
-  const partnerCard = sampleFrontCards[(activeIndex + 1) % sampleFrontCards.length]
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/45 p-4 backdrop-blur">
       <div className="w-full max-w-2xl overflow-hidden rounded-3xl bg-white shadow-2xl">
@@ -77,7 +75,6 @@ export function HowToPlayModal({ open, onClose, difficulty }: HowToPlayModalProp
           <PreviewDemo
             backAsset={sampleCardBack}
             currentCard={currentCard}
-            partnerCard={partnerCard}
             activeIndex={activeIndex}
             onSelect={setActiveIndex}
           />
@@ -115,7 +112,6 @@ export function HowToPlayModal({ open, onClose, difficulty }: HowToPlayModalProp
 type PreviewDemoProps = {
   backAsset: string
   currentCard: { id: string; title: string; description: string; asset: string }
-  partnerCard: { id: string; title: string; description: string; asset: string }
   activeIndex: number
   onSelect: (index: number) => void
 }
@@ -123,7 +119,6 @@ type PreviewDemoProps = {
 function PreviewDemo({
   backAsset,
   currentCard,
-  partnerCard,
   activeIndex,
   onSelect,
 }: PreviewDemoProps) {
@@ -166,7 +161,7 @@ function PreviewDemo({
 
         <div className="flex items-center gap-3">
           <MatchedCard asset={currentCard.asset} celebrate />
-          <MatchedCard asset={partnerCard.asset} />
+          <MatchedCard asset={currentCard.asset} />
           <span className="text-sm font-semibold text-emerald-600">そろった！</span>
         </div>
       </div>
