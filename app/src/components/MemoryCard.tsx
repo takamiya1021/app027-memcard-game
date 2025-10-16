@@ -15,9 +15,12 @@ export function MemoryCard({
 }: MemoryCardProps) {
   const isFaceUp = card.status !== 'hidden' || revealFront
   const isMatched = card.status === 'matched'
-  const borderClass = card.theme === 'storybook' ? 'border-amber-200' : 'border-sky-200'
-  const backgroundClass =
-    card.theme === 'storybook' ? 'bg-white/70' : 'bg-transparent'
+  const borderClass = isMatched
+    ? 'border-emerald-400 shadow-emerald-200'
+    : card.theme === 'storybook'
+      ? 'border-amber-200'
+      : 'border-sky-200'
+  const backgroundClass = 'bg-transparent'
   const ariaLabel = isFaceUp ? card.front.label : 'カードをめくる'
 
   const faceBaseClass =
@@ -38,7 +41,9 @@ export function MemoryCard({
   return (
     <button
       type="button"
-      className={`group relative h-28 w-full max-w-[120px] cursor-pointer rounded-xl border-2 ${borderClass} ${backgroundClass} p-0 transition-transform duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-400 disabled:cursor-not-allowed disabled:opacity-80 sm:h-32`}
+      className={`group relative h-28 w-full max-w-[120px] cursor-pointer rounded-xl border-2 ${borderClass} ${backgroundClass} p-0 transition-all duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-sky-400 disabled:cursor-not-allowed sm:h-32 ${
+        isMatched ? 'shadow-lg' : ''
+      }`}
       onClick={() => onFlip(card.id)}
       disabled={
         disabled ||
@@ -74,7 +79,7 @@ export function MemoryCard({
 
         <div
           className={frontFaceClass}
-          style={{ transform: 'rotateY(180deg)', opacity: isMatched ? 0.75 : 1 }}
+          style={{ transform: 'rotateY(180deg)' }}
         >
           {card.front.kind === 'emoji' ? (
             <>
